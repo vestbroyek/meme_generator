@@ -6,31 +6,45 @@ from docx import Document
 import subprocess
 
 class IngestorInterface(ABC):
-    """
-    Abstract ingestor interface to be realised by concrete classes for different filetypes.
-    """
+    """Abstract ingestor interface to be realised by concrete classes."""
 
     allowed_extensions = []
 
     @classmethod
     def can_ingest(cls, path: str) -> bool:
+        """
+        Check whether a class can ingest a given filetype based on cls.allowed_extensions.
+        
+        :param path:    A path to check for allowed extensions
+        :returns bool:  Whether the file can be ingested
+        """
         ext = path.split('.')[1]
         return ext in cls.allowed_extensions
 
     @classmethod
     @abstractmethod
     def parse(cls, path: str) -> List[QuoteModel]:
+        """
+        Parse a file into a list of quotes contained by instances of QuoteModel.
+
+        :param path:                    A filepath containing a file to parse
+        :returns List[QuoteModel]:      A list of quotes contained by QuoteModel
+        """
         pass
 
 class CSVIngestor(IngestorInterface):
-    """
-    Class for ingesting .csvs containing quotes. Realises IngestorInterface.
-    """
+    """Class for ingesting .csvs containing quotes. Realises IngestorInterface."""
     
     allowed_extensions = ['csv']
 
     @classmethod
     def parse(cls, path: str) -> List[QuoteModel]:
+        """
+        Parse a file into a list of quotes contained by instances of QuoteModel.
+
+        :param path:                    A filepath containing a file to parse
+        :returns List[QuoteModel]:      A list of quotes contained by QuoteModel
+        """
         # check if allowed filetype
         if not cls.can_ingest(path):
             ext = path.split('.')[1]
@@ -49,14 +63,18 @@ class CSVIngestor(IngestorInterface):
         return quotes
 
 class DOCXIngestor(IngestorInterface):
-    """
-    Class for ingesting .docx files. Realises IngestorInterface
-    """
+    """Class for ingesting .docx files. Realises IngestorInterface."""
 
     allowed_extensions = ['docx']
 
     @classmethod
     def parse(cls, path: str) -> List[QuoteModel]:
+        """
+        Parse a file into a list of quotes contained by instances of QuoteModel.
+
+        :param path:                    A filepath containing a file to parse
+        :returns List[QuoteModel]:      A list of quotes contained by QuoteModel
+        """
         # check if allowed filetype
         if not cls.can_ingest(path):
             ext = path.split('.')[1]
@@ -73,14 +91,18 @@ class DOCXIngestor(IngestorInterface):
                 quotes.append(QuoteModel(body, author))
 
 class PDFIngestor(IngestorInterface):
-    """
-    Class for ingesting .pdf files. Realises IngestorInterface.
-    """
+    """Class for ingesting .pdf files. Realises IngestorInterface."""
 
     allowed_extensions = ['pdf']
 
     @classmethod
     def parse(cls, path: str) -> List[QuoteModel]:
+        """
+        Parse a file into a list of quotes contained by instances of QuoteModel.
+
+        :param path:                    A filepath containing a file to parse
+        :returns List[QuoteModel]:      A list of quotes contained by QuoteModel
+        """
         # check if allowed filetype
         if not cls.can_ingest(path):
             ext = path.split('.')[1]
@@ -89,7 +111,7 @@ class PDFIngestor(IngestorInterface):
         
         # parse into txt
         quotes = []
-        text = subprocess.run(['pdftotext', '-layout', f'{path}', 'outfile'])
+        subprocess.run(['pdftotext', '-layout', f'{path}', 'outfile'])
         with open('outfile', 'r') as f:
             for line in f:
                 if '-' in line:
@@ -103,14 +125,18 @@ class PDFIngestor(IngestorInterface):
         return quotes
 
 class TXTIngestor(IngestorInterface):
-    """
-    Class for ingesting .txt files. Realises IngestorInterface.
-    """
+    """Class for ingesting .txt files. Realises IngestorInterface."""
     
     allowed_extensions = ['txt']
 
     @classmethod
     def parse(cls, path: str) -> List[QuoteModel]:
+        """
+        Parse a file into a list of quotes contained by instances of QuoteModel.
+
+        :param path:                    A filepath containing a file to parse
+        :returns List[QuoteModel]:      A list of quotes contained by QuoteModel
+        """
         # check if allowed filetype
         if not cls.can_ingest(path):
             ext = path.split('.')[1]
@@ -121,19 +147,25 @@ class TXTIngestor(IngestorInterface):
             for line in f:
                 # no headers here, just split on - and read
                 line = line.replace('\n', '')
-                quotes.append(QuoteModel(line.split('-')[0].strip(), line.split('-')[1].strip()))
+                body = line.split('-')[0].strip()
+                author = line.split('-')[1].strip()
+                quotes.append(QuoteModel(body, author))
 
         return quotes
 
 class Ingestor(IngestorInterface):
-    """
-    Class encapsulating all ingestor concrete classes.
-    """
+    """Class encapsulating all ingestor concrete classes."""
 
     ingestors = [CSVIngestor, TXTIngestor, DOCXIngestor, PDFIngestor]
 
     @classmethod
     def parse(cls, path):
+        """
+        Parse a file into a list of quotes contained by instances of QuoteModel.
+
+        :param path:                    A filepath containing a file to parse
+        :returns List[QuoteModel]:      A list of quotes contained by QuoteModel
+        """
         for ingestor in cls.ingestors:
             if ingestor.can_ingest(path):
                 return ingestor.parse(path)
