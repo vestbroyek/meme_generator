@@ -52,12 +52,15 @@ class CSVIngestor(IngestorInterface):
 
         # if so, parse line by line and return list of quotes
         quotes = []
-        with open(path, 'r') as f:
-            lines = reader(f, delimiter=',', quotechar='"')
-            # Skip header
-            next(lines)
-            for line in lines:
-                quotes.append(QuoteModel(line[0], line[1]))
+        try:
+            with open(path, 'r') as f:
+                lines = reader(f, delimiter=',', quotechar='"')
+                # Skip header
+                next(lines)
+                for line in lines:
+                    quotes.append(QuoteModel(line[0], line[1]))
+        except FileNotFoundError:
+            print("File was not found.")
 
         
         return quotes
@@ -82,13 +85,16 @@ class DOCXIngestor(IngestorInterface):
 
         # parse
         quotes = []
-        document = Document(path)
-        for para in document.paragraphs:
-            if len(para.text) > 0:
-                # split on - and remove spaces and quotes
-                body = para.text.split('-')[0].strip().replace('"', '')
-                author = para.text.split('-')[1].strip().replace('"', '')
-                quotes.append(QuoteModel(body, author))
+        try:
+            document = Document(path)
+            for para in document.paragraphs:
+                if len(para.text) > 0:
+                    # split on - and remove spaces and quotes
+                    body = para.text.split('-')[0].strip().replace('"', '')
+                    author = para.text.split('-')[1].strip().replace('"', '')
+                    quotes.append(QuoteModel(body, author))
+        except FileNotFoundError:
+            print("File was not found.")
 
 class PDFIngestor(IngestorInterface):
     """Class for ingesting .pdf files. Realises IngestorInterface."""
@@ -110,17 +116,20 @@ class PDFIngestor(IngestorInterface):
 
         
         # parse into txt
-        quotes = []
-        subprocess.run(['pdftotext', '-layout', f'{path}', 'outfile'])
-        with open('outfile', 'r') as f:
-            for line in f:
-                if '-' in line:
-                    body = line.split('-')[0].replace('\n', '').strip()
-                    author = line.split('-')[1].replace('\n', '').strip() 
-                    quotes.append(QuoteModel(body, author))
+        try:
+            quotes = []
+            subprocess.run(['pdftotext', '-layout', f'{path}', 'outfile'])
+            with open('outfile', 'r') as f:
+                for line in f:
+                    if '-' in line:
+                        body = line.split('-')[0].replace('\n', '').strip()
+                        author = line.split('-')[1].replace('\n', '').strip() 
+                        quotes.append(QuoteModel(body, author))
 
-        # rm outfile
-        subprocess.run(['rm', 'outfile'])
+            # rm outfile
+            subprocess.run(['rm', 'outfile'])
+        except FileNotFoundError:
+            print("File was not found.")
 
         return quotes
 
@@ -142,14 +151,18 @@ class TXTIngestor(IngestorInterface):
             ext = path.split('.')[1]
             raise Exception(f'cannot ingest filetype {ext}') 
 
-        quotes = []
-        with open(path, 'r') as f:
-            for line in f:
-                # no headers here, just split on - and read
-                line = line.replace('\n', '')
-                body = line.split('-')[0].strip()
-                author = line.split('-')[1].strip()
-                quotes.append(QuoteModel(body, author))
+        # try parsing
+        try:
+            quotes = []
+            with open(path, 'r') as f:
+                for line in f:
+                    # no headers here, just split on - and read
+                    line = line.replace('\n', '')
+                    body = line.split('-')[0].strip()
+                    author = line.split('-')[1].strip()
+                    quotes.append(QuoteModel(body, author))
+        except FileNotFoundError:
+            print("File was not found.")
 
         return quotes
 
@@ -166,6 +179,10 @@ class Ingestor(IngestorInterface):
         :param path:                    A filepath containing a file to parse
         :returns List[QuoteModel]:      A list of quotes contained by QuoteModel
         """
-        for ingestor in cls.ingestors:
-            if ingestor.can_ingest(path):
-                return ingestor.parse(path)
+        # try parsing
+        try:
+            for ingestor in cls.ingestors:
+                if ingestor.can_ingest(path):
+                    return ingestor.parse(path)
+        except FileNotFoundError:
+            print("File was not found.")
