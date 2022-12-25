@@ -28,7 +28,10 @@ class MemeEngine:
 
         """
         # initialise image
-        img = Image.open(img_path)
+        try:
+            img = Image.open(img_path)
+        except FileNotFoundError:
+            print("File could not be found.")
         # resize
         ratio = 500/img.width
         (width, height) = (500, ratio*img.height)
@@ -37,8 +40,11 @@ class MemeEngine:
         #  create canvas
         draw = ImageDraw.Draw(img_resized)
         #  get font
-        fontpath = os.environ.get('FONTPATH')
-        font = ImageFont.truetype(fontpath, size=randint(25, 40))
+        try:
+            fontpath = os.environ.get('FONTPATH')
+            font = ImageFont.truetype(fontpath, size=randint(25, 40))
+        except OSError:
+            print("Could not open font file.")
         #  add text at: random coordinates, random font size and random colour
         draw.text((
             randint(0, 200), randint(0, 200)),
@@ -52,6 +58,9 @@ class MemeEngine:
         # save
         randstring = generate_random_string()
         filename = img_path.split('.')[0] + randstring
-        img_resized.save(filename+'.jpg')
+        try:
+            img_resized.save(filename+'.jpg')
+        except OSError:
+            print("File could not be saved.")
 
         return filename+'.jpg'
