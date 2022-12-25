@@ -1,13 +1,26 @@
 from PIL import Image, ImageDraw, ImageFont
+from utils import generate_random_string
+from random import randint
 import os
-from random import randint, choice
-import string
 
 class MemeEngine:
+    """Class for generating memes."""
+
     def __init__(self):
+        """Init method for MemeEngine. Does not take arguments; use `make_meme` to generate memes."""
         pass
 
     def make_meme(self, img_path: str, text: str, author: str, width: int = 500) -> str:
+        """
+        Instance method for generating memes.
+
+        :param img_path:        A filepath containing an image to use as a base for the meme
+        :param text:            A quote to put on the meme
+        :param author:          The author of the quote
+        :param width:           The width of the image in pixels, 500 by default
+        :returns str:           A path where the generated meme is located
+        
+        """
         # initialise image
         img = Image.open(img_path)
         # resize
@@ -17,22 +30,19 @@ class MemeEngine:
 
         ### add quote 
         # create canvas
-        draw = ImageDraw.Draw(img)
+        draw = ImageDraw.Draw(img_resized)
         # get font
-        fontpath = '/Users/maurits/training/vscode/udacity-intermediate-python/git/meme_generator/MemeEngine/fonts/LDFComicSans.ttf'
+        fontpath = os.environ.get('FONTPATH')
         font = ImageFont.truetype(fontpath, size=randint(25, 40))
-        # add text at random coordinates, random font size (between 25 and 40), and random colour
+        # add text at: random coordinates, random font size and random colour
         draw.text((
-            randint(0, 400), randint(0, 400)), 
+            randint(0, 200), randint(0, 200)), 
             f"{text} - {author}", 
             font=font,
             fill=(randint(0, 255), randint(0,255), randint(0,255), randint(0,255)))
-        # save 
-        randstring = ''.join(choice(string.ascii_uppercase + string.digits) for _ in range(5))
+        # save
+        randstring = generate_random_string()
         filename = img_path.split('.')[0] + randstring
-        img.save(filename+'.jpg')
+        img_resized.save(filename+'.jpg')
 
         return filename+'.jpg' 
-
-
-    
