@@ -1,6 +1,7 @@
 from random import choice
 from string import ascii_uppercase, digits
 
+
 def generate_random_string(length: int = 5) -> str:
     """
     Generate a random string of uppercase numbers and digits.
