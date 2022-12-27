@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 from .utils import generate_random_string
+import subprocess
 from random import randint
 import os
 
@@ -7,9 +8,14 @@ import os
 class MemeEngine:
     """Class for generating memes."""
 
-    def __init__(self):
-        """Init method for MemeEngine. Does not take arguments."""
-        pass
+    def __init__(self, dir: str) -> None:
+        """Init method for MemeEngine.
+
+        :param dir: the directory to save memes in."""
+
+        self.dir = dir
+
+        subprocess.run(["mkdir", f"{dir}"])
 
     def make_meme(
             self,
@@ -31,10 +37,12 @@ class MemeEngine:
         try:
             img = Image.open(img_path)
         except FileNotFoundError:
-            print("File could not be found.")
+            print(f"File {img_path} could not be found.")
+            raise
+
         # resize
         ratio = 500/img.width
-        (width, height) = (500, ratio*img.height)
+        (width, height) = (500, int(ratio*img.height))
         img_resized = img.resize((width, height))
 
         #  create canvas
@@ -57,10 +65,10 @@ class MemeEngine:
                 randint(0, 255)))
         # save
         randstring = generate_random_string()
-        filename = img_path.split('.')[0] + randstring
+        filename = self.dir + '/' + randstring
         try:
-            img_resized.save(filename+'.jpg')
+            img_resized.save(filename + '.jpg')
         except OSError:
-            print("File could not be saved.")
+            print(f"File {filename + '.jpg'} could not be saved.")
 
         return filename+'.jpg'
