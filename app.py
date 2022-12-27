@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from QuoteEngine import Ingestor
 from MemeEngine import MemeEngine
-import os 
+import os
 from random import choice
 import requests
 import subprocess
@@ -13,9 +13,9 @@ app = Flask(__name__)
 
 meme = MemeEngine('./static')
 
-def setup():
-    """Load all resources"""
 
+def setup():
+    """Load all resources."""
     cwd = os.getcwd()
     quote_files = [cwd+'/_data/DogQuotes/DogQuotesTXT.txt',
                    cwd+'/_data/DogQuotes/DogQuotesDOCX.docx',
@@ -27,16 +27,19 @@ def setup():
         quotes.extend(Ingestor.parse(f))
 
     images_path = cwd+"/_data/photos/dog/"
+    img_list = os.listdir(images_path)
 
-    imgs = [images_path+file for file in os.listdir(images_path) if file.split('.')[1] == 'jpg']
+    imgs = [
+        images_path + file
+        for file in img_list
+        if file.split('.')[1] == 'jpg']
 
     return quotes, imgs
 
 
 @app.route('/')
 def meme_rand():
-    """Generate a random meme"""
-
+    """Generate a random meme."""
     quotes, imgs = setup()
 
     img = choice(imgs)
@@ -47,16 +50,17 @@ def meme_rand():
 
 @app.route('/create', methods=['GET'])
 def meme_form():
-    """User input for meme information"""
+    """User input for meme information."""
     return render_template('meme_form.html')
 
 
 @app.route('/create', methods=['POST'])
 def meme_post():
-    """Create a user defined meme"""
-
+    """Create a user defined meme."""
     # fetch user params
-    url, body, author = [request.form.get(param) for param in ['image_url', 'body', 'author']]
+    url, body, author = [
+        request.form.get(param)
+        for param in ['image_url', 'body', 'author']]
 
     # save img to temp file
     response = requests.get(url, stream=True)

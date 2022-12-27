@@ -11,8 +11,8 @@ class MemeEngine:
     def __init__(self, dir: str) -> None:
         """Init method for MemeEngine.
 
-        :param dir: the directory to save memes in."""
-
+        :param dir: the directory to save memes in.
+        """
         self.dir = dir
 
         subprocess.run(["mkdir", f"{dir}"])

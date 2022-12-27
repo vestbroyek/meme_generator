@@ -8,13 +8,12 @@ import argparse
 
 def generate_meme(path: str = None, body: str = None, author: str = None):
     """Generate a meme given a path and a quote.
-    
+
     :param path:    A path to a file
     :param body:    A quote
     :param author:  The quote's author
     :returns str:   The path to the generated meme.
     """
-    
     cwd = os.getcwd()
     quote = None
 
@@ -55,9 +54,7 @@ if __name__ == "__main__":
     parser.add_argument('--body', type=str, help='The quote body')
     parser.add_argument('--author', type=str, help='The quote\'s author')
     parser.add_argument('--path', type=str, help='Path to an image')
-
-    # parse
     args = parser.parse_args()
-    
+
     # execute
     generate_meme(args.path, args.body, args.author)

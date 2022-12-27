@@ -63,7 +63,7 @@ class CSVIngestor(IngestorInterface):
                     quotes.append(QuoteModel(line[0], line[1]))
 
             return quotes
-            
+
         except FileNotFoundError:
             print("File was not found.")
 
@@ -130,7 +130,7 @@ class PDFIngestor(IngestorInterface):
                         body = line.split('-')[0].replace('\n', '').strip()
                         author = line.split('-')[1].replace('\n', '').strip()
                         quotes.append(QuoteModel(body, author))
-            
+
             # rm outfile
             subprocess.run(['rm', 'outfile'])
 
@@ -168,12 +168,11 @@ class TXTIngestor(IngestorInterface):
                     body = line.split('-')[0].strip()
                     author = line.split('-')[1].strip()
                     quotes.append(QuoteModel(body, author))
-            
+
             return quotes
 
         except FileNotFoundError:
             print("File was not found.")
-
 
 
 class Ingestor(IngestorInterface):
