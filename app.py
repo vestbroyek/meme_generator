@@ -69,7 +69,7 @@ def meme_post():
     del response
 
     cwd = os.getcwd()
-    path = generate_meme(cwd+"/"+"tempfile.jpg", author, body)
+    path = generate_meme(cwd+"/"+"tempfile.jpg", body, author)
     # abs path
     path = os.path.basename(path)
     subprocess.run(['rm', 'tempfile.jpg'])
