@@ -1,7 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-from .utils import generate_random_string
-import subprocess
-from random import randint
+from .utils import generate_random_string, resize_image, draw_quote
 import os
 
 
@@ -19,7 +17,6 @@ class MemeEngine:
             os.mkdir(self.dir)
         except FileExistsError:
             print(f"{self.dir} already exists, no need to create new.")
-        # subprocess.run(["mkdir", f"{dir}"], shell=True)
 
     def make_meme(
             self,
@@ -45,31 +42,15 @@ class MemeEngine:
             raise
 
         # resize
-        ratio = 500/img.width
-        (width, height) = (500, int(ratio*img.height))
-        img_resized = img.resize((width, height))
+        img_resized = resize_image(img)
 
-        #  create canvas
-        draw = ImageDraw.Draw(img_resized)
-        #  get font
-        try:
-            fontpath = "./MemeEngine/fonts/LDFComicSans.ttf"
-            font = ImageFont.truetype(fontpath, size=randint(25, 40))
-        except OSError:
-            print("Could not open font file.")
-        #  add text at: random coordinates, random font size and random colour
-        draw.text((
-            randint(0, 200), randint(0, 200)),
-            f"{text} - {author}",
-            font=font,
-            fill=(
-                randint(0, 255),
-                randint(0, 255),
-                randint(0, 255),
-                randint(0, 255)))
+        # add quote
+        draw_quote(img_resized, text, author)
+
         # save
         randstring = generate_random_string()
         filename = self.dir + '/' + randstring
+
         try:
             img_resized.save(filename + '.jpg')
         except OSError:
