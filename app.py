@@ -72,7 +72,8 @@ def meme_post():
     path = generate_meme(cwd+"/"+"tempfile.jpg", body, author)
     # abs path
     path = os.path.basename(path)
-    subprocess.run(['rm', 'tempfile.jpg'], shell=True)
+    os.remove('tempfile.jpg')
+    # subprocess.run(['rm', 'tempfile.jpg'], shell=True)
 
     return render_template('meme.html', path='./static/'+path)
 
