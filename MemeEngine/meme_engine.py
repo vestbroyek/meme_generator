@@ -15,7 +15,11 @@ class MemeEngine:
         """
         self.dir = dir
 
-        subprocess.run(["mkdir", f"{dir}"], shell=True)
+        try:
+            os.mkdir(self.dir)
+        except FileExistsError:
+            print(f"{self.dir} already exists, no need to create new.")
+        # subprocess.run(["mkdir", f"{dir}"], shell=True)
 
     def make_meme(
             self,
@@ -49,7 +53,7 @@ class MemeEngine:
         draw = ImageDraw.Draw(img_resized)
         #  get font
         try:
-            fontpath = os.environ.get('FONTPATH')
+            fontpath = "./MemeEngine/fonts/LDFComicSans.ttf"
             font = ImageFont.truetype(fontpath, size=randint(25, 40))
         except OSError:
             print("Could not open font file.")
