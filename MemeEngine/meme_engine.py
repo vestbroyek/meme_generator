@@ -15,7 +15,7 @@ class MemeEngine:
         """
         self.dir = dir
 
-        subprocess.run(["mkdir", f"{dir}"])
+        subprocess.run(["mkdir", f"{dir}"], shell=True)
 
     def make_meme(
             self,
