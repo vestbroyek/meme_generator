@@ -28,10 +28,6 @@ For more detail, read the below section.
 ### Root folder
 The root of the project contains the following files:
 
-`.env`
-
-The `.env` file lets you set environment variables. In this case, the only environment variable is the path to the font you want to use. I've included Comic Sans here, but feel free to change it. 
-
 `app.py`
 
 Defines the Flask app. It defines 
@@ -54,11 +50,11 @@ This module contains the necessary functionality for generating memes.
 
 `fonts`
 
-The `fonts` folder contains .ttf font files which you can add to and refer to in `.env`. 
+The `fonts` folder contains .ttf font files.
 
 `__init__.py`
 
-This file tells Python how to initialise the module. In this case, it simplifies the import of the `MemeEngine` class and also makes the `dotenv` library available, for working with the `.env` file.
+This file tells Python how to initialise the module. In this case, it simplifies the import of the `MemeEngine` class.
 
 `meme_engine.py`
 
@@ -75,7 +71,7 @@ This module contains the code for ingesting and structuring quotes.
 
 `__init__.py`
 
-This file tells Python how to initialise the module. In this case, it simplifies the import of the `QuoteModel` class and also makes the `dotenv` library available, for working with the `.env` file.
+This file tells Python how to initialise the module. In this case, it simplifies the import of the `QuoteModel` class.
 
 `ingestors.py`
 
