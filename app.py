@@ -4,7 +4,7 @@ from MemeEngine import MemeEngine
 import os
 from random import choice
 import requests
-import subprocess
+import PIL
 import shutil
 from meme import generate_meme
 
@@ -44,8 +44,12 @@ def meme_rand():
 
     img = choice(imgs)
     quote = choice(quotes)
-    path = meme.make_meme(img, quote.body, quote.author)
-    return render_template('meme.html', path=path)
+    try:
+        path = meme.make_meme(img, quote.body, quote.author)
+        return render_template('meme.html', path=path)
+
+    except PIL.UnidentifiedImageError:
+        print("Could not open image file.")
 
 
 @app.route('/create', methods=['GET'])
@@ -57,23 +61,33 @@ def meme_form():
 @app.route('/create', methods=['POST'])
 def meme_post():
     """Create a user defined meme."""
-    # fetch user params
-    url, body, author = [
-        request.form.get(param)
-        for param in ['image_url', 'body', 'author']]
+    try:
+        # fetch user params
+        url, body, author = [
+            request.form.get(param)
+            for param in ['image_url', 'body', 'author']]
 
-    # save img to temp file
-    response = requests.get(url, stream=True)
+        # save img to temp file
+        response = requests.get(url, stream=True)
+
+    except requests.exceptions.ConnectionError:
+        print("A connection error occurred, did you submit a valid URL?")
+        return render_template('meme_error.html')
+
     with open('tempfile.jpg', 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
     del response
 
     cwd = os.getcwd()
-    path = generate_meme(cwd+"/"+"tempfile.jpg", body, author)
+    try:
+        path = generate_meme(cwd+"/"+"tempfile.jpg", body, author)
+    except PIL.UnidentifiedImageError:
+        print("Image could not be opened, is it a valid image file?")
+        return render_template('meme_error.html')
+
     # abs path
     path = os.path.basename(path)
     os.remove('tempfile.jpg')
-    # subprocess.run(['rm', 'tempfile.jpg'], shell=True)
 
     return render_template('meme.html', path='./static/'+path)
 
